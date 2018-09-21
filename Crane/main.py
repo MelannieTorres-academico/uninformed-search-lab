@@ -1,4 +1,4 @@
-#Alan Kuri A01204805 & Melannie Torres A01361808
+#Alan Kuri & Melannie Torres
 
 import sys
 from itertools import *
@@ -10,139 +10,98 @@ try:
     import Queue as Q  # ver. < 3.0
 except ImportError:
     import queue as Q
-
+'''
+# Consistent Heuristic, every different letter in different order is 1+
+def heuristic_consistent(max_height, actual_state, goal_state):
+    print()
+    for i in range(max_height):
+        print('ACTUAL', actual_state[i], 'GOAL', goal_state[i])
+        alan_putito = set(actual_state[i]).intersection(set(goal_state[i]))
+        print(alan_putito)
+    pass
+'''
 def heuristic_consistent(max_height, actual_state, goal_state):
     lel = 0
     for i, h in zip(actual_state, goal_state):
         for e, k in zip_longest(i, h):
             if e != k:
                 lel = lel + 1
+    return lel
 
-    return 0
 
 def calculateCostOfMoveBox(i, j):
-    #print('CALCULATE COST')
     actionCost = 1 + (abs(i - j))
-
+    
     return actionCost
-
+    
 def moveBox(original_current_node, i, j):
-    #print('MOVE BOX')
     current_node = deepcopy(original_current_node)
     node = {}
     #remove node from column i
-    for element in current_node[i]:
-        #print('ELEMENT', element)
+    for element in current_node['state'][i]:
         if element != []:
             node = element
-            current_node[i].remove(element)
+            current_node['state'][i].remove(element)
             #put node in j
-            current_node[j].append(node)
+            current_node['state'][j].append(node)
             break
-    #print('return move box', current_node)
     return current_node
 
-def actions(current_node, max_height, frontier, goal, visited):
-    #check for all possible states
-    #pprint('ACTIONS')
+def actions(current_node, max_height, frontier, goal):
     num_cols = len(current_node)
-    #print('CURRENT NODE', current_node)
-
-    tot = current_node
+    
+    tot = current_node['state']
 
     #remove repeted states
-
     for i in range(num_cols):
         for j in range(num_cols):
             if (i != j):
-                #print('i', i, '!=', 'j', j)
                 if (len(tot[j]) < max_height): #checks if stack is full7
-                    #print(len(tot[j]), '<' ,max_height)
                     if (len(tot[i]) != 0): #checks that the place where we'll remove the box is not empty
-                        #print(len(tot[i]), '!=', 0)
                         cost = calculateCostOfMoveBox(i, j)
-                        #print('cost', cost)
-                        # calculate h
-                        #print('CALL TO MOVE BOX')
-                        #print(moveBox(current_node, i, j))
                         tut = moveBox(current_node, i, j)
-                        new_cost = cost + heuristic_consistent(max_height, current_node, goal)
-                        #print(frontier.queue)
-                        c = None
-                        if not frontier.empty():
-                            c, n, a = frontier.queue[0]
+    return tut
+    
+    
 
-                        if tut not in visited and tut not in frontier.queue:
-                            frontier.put((new_cost, moveBox(current_node, i, j), (i, j)))
-                            #print(i, j)
-                        elif c is not None and c > new_cost:
-                            frontier.get()
-                            frontier.put((new_cost, moveBox(current_node, i, j), (i, j)))
-                            #print(i, j)
-                        #print(i, j)
-
-def goal_test(actual_state, goal_state, cost, action):
-    #print(" GOAL STATE")
-    #print("actual_state", actual_state)
-    #print("goal_state", goal_state)
-    lis = []
+def goal_test(actual_state, goal_state):
+    print()
     if(actual_state == goal_state):
-        #print("actual state es == goal_state")
-        lis.append((actual_state, cost, action))
-        #print("append el actual state cost y action a lista")
-        print(actual_state, cost, action)
         return True
-
-    for ac, go in zip(actual_state, goal_state):
-        for a, g in zip_longest(ac, go):
-            if(g == 'X'):
-                #print('encontre x')
-                continue
-            if(g != a):
-                return False
-    lis.append((actual_state, cost, action))
-   # print('LIS', lis)
-    return True
+    return False
 
 #https://www.bogotobogo.com/python/python_PriorityQueue_heapq_Data_Structure.php
 #h=0
 def treeSearch (max_height, start, goal):
     frontier = Q.PriorityQueue()
+    nodes = {
+        'state': start,
+        'total_cost': 0
+    }
     visited = []
-
-    frontier.put((0, start, (0,0)))
-
-    #i = 0
-    while True:
+    
+    frontier.put((0, nodes))
+    
+    i = 0
+    while i <= 5:
         if frontier.empty():
-            print('No solution found')
+            print('NO HAY NADA EN FRONTIER')
             return False
-
-        cost, current_node, action = frontier.get()
-
-        #print('current_node', current_node)
-        if goal_test(current_node, goal, action, cost):
-            #print('SOLUTION FOUND')
-            print(cost)
-            print(action)
-            return True
-
+        print('POP FROM QUEUE', frontier.queue)
+        print('current_node', frontier.queue[0])
+        current_node = frontier.queue[0]  #problema, no sabe por qué ordenar la priority queue
+        
+        
+        if goal_test(current_node['state'], goal):
+            print('SOLUTION FOUND')
+            break
+        
         visited.append(current_node)
-        actions(current_node, max_height, frontier, goal, visited)
-        #print('V:', visited)
-        #print('F:', frontier.queue)
-        #poss_actions=actions(cont_start, max_height, frontier)
-        #for action in poss_actions:
-        #if action:
-        #print("in for")
-        #i += 1
-
-
-        #print(new_node in visited)
-        #print(new_node in frontier.queue)
-        #new_cost = new_cost + heuristic_consistent(max_height, new_node, goal)
-        #frontier.put((new_cost, new_node))
-
+        new_node = actions(current_node, max_height, frontier, goal)
+        print('NEW NODE', new_node)
+        print('V:', visited)
+        print('F:', frontier.queue)
+        
 
 #Read all lines in txt
 data = sys.stdin.readlines()
@@ -159,8 +118,8 @@ for element in start.split(";"):
     parse_start = list(filter(None, element.replace('(', "").replace(')', "").replace(' ', "").split(',')))
     cont_start.append(parse_start)
 #print(parse_start)
-
-
+    
+    
 #Replace and Split of goal string
 #print("\n######### Goal String ###########")
 cont_goal = []
@@ -176,16 +135,15 @@ for element in goal.split(";"):
 #print("-----Tree Search-----")
 #treeSearch (max_height, cont_start, cont_goal)
 
-#print("-----Heuristic_consistent------")
+print("-----Heuristic_consistent------")
 #heuristic_consistent(max_height, cont_start, cont_goal)
 
-#print("----Actions-----")
+print("----Actions-----")
 #frontier = Q.PriorityQueue()
 
 #print(cont_start)
 #actions(cont_start, 3, frontier)
 
 treeSearch (max_height, cont_start, cont_goal)
-
-
+        
     
