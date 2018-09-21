@@ -1,4 +1,4 @@
-#Alan Kuri A01204805 & Melannie Torres A01361808
+#Alan Kuri & Melannie Torres
 
 import sys
 from itertools import *
@@ -9,15 +9,24 @@ try:
     import Queue as Q  # ver. < 3.0
 except ImportError:
     import queue as Q
-
+'''
+# Consistent Heuristic, every different letter in different order is 1+
+def heuristic_consistent(max_height, actual_state, goal_state):
+    print()
+    for i in range(max_height):
+        print('ACTUAL', actual_state[i], 'GOAL', goal_state[i])
+        alan_putito = set(actual_state[i]).intersection(set(goal_state[i]))
+        print(alan_putito)
+    pass
+'''
 def heuristic_consistent(max_height, actual_state, goal_state):
     lel = 0
     for i, h in zip(actual_state, goal_state):
         for e, k in zip_longest(i, h):
             if e != k:
                 lel = lel + 1
+    return lel
 
-    return 0
 
 def calculateCostOfMoveBox(i, j):
     actionCost = 1 + (abs(i - j))
@@ -79,13 +88,17 @@ def goal_test(actual_state, goal_state, cost, action):
 #h=0
 def treeSearch (max_height, start, goal):
     frontier = Q.PriorityQueue()
+    nodes = {
+        'state': start,
+        'total_cost': 0
+    }
     visited = []
 
     frontier.put((0, 0, start, []))
 
     while True:
         if frontier.empty():
-            print('No solution found')
+            print('NO HAY NADA EN FRONTIER')
             return False
 
         priority, cost, current_node, path = frontier.get()
