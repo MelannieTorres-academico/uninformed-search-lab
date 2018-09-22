@@ -55,7 +55,7 @@ def actions(current_node, max_height, frontier, goal, visited, last_cost, path):
                         new_cost = last_cost
                         new_cost += calculateCostOfMoveBox(i, j)
                         tut = moveBox(current_node, i, j)
-                        priority = new_cost + heuristic(max_height, current_node, goal, 2) #consistent 1, #h=0 2 , non consistent
+                        priority = new_cost + heuristic(max_height, current_node, goal, 1) #consistent 1, #h=0 2 , non consistent
                         c = None
                         if not frontier.empty():
                            p, c, n, a = frontier.queue[0]
