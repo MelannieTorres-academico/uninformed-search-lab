@@ -9,23 +9,20 @@ try:
     import Queue as Q  # ver. < 3.0
 except ImportError:
     import queue as Q
-'''
-# Consistent Heuristic, every different letter in different order is 1+
-def heuristic_consistent(max_height, actual_state, goal_state):
-    print()
-    for i in range(max_height):
-        print('ACTUAL', actual_state[i], 'GOAL', goal_state[i])
-        alan_putito = set(actual_state[i]).intersection(set(goal_state[i]))
-        print(alan_putito)
-    pass
-'''
-def heuristic_consistent(max_height, actual_state, goal_state):
+
+
+def heuristic(max_height, actual_state, goal_state, which_heuristic):
     lel = 0
     for i, h in zip(actual_state, goal_state):
         for e, k in zip_longest(i, h):
             if e != k:
                 lel = lel + 1
-    return lel
+    if which_heuristic == 1 : #consistent
+        return lel
+    elif which_heuristic == 2: #h=0
+        return 0
+    else: 
+        return lel*10
 
 
 def calculateCostOfMoveBox(i, j):
@@ -58,7 +55,7 @@ def actions(current_node, max_height, frontier, goal, visited, last_cost, path):
                         new_cost = last_cost
                         new_cost += calculateCostOfMoveBox(i, j)
                         tut = moveBox(current_node, i, j)
-                        priority = new_cost + heuristic_consistent(max_height, current_node, goal)
+                        priority = new_cost + heuristic(max_height, current_node, goal, 2) #consistent 1, #h=0 2 , non consistent
                         c = None
                         if not frontier.empty():
                            p, c, n, a = frontier.queue[0]
